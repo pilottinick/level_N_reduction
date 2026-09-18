@@ -206,7 +206,7 @@ function IsPrimitiveOneReduced(a, b, c)
 end function;
 
 intrinsic LevelOneClasses(D) -> SetEnum
-  {Returns a set of representatives for the level 1 classes of discriminant D.}
+  {Returns a set of reduced representatives for the level 1 classes of discriminant D.}
   assert D lt 0 and (D mod 4 eq 0 or D mod 4 eq 1);
 
   forms := {};
@@ -227,21 +227,11 @@ intrinsic LevelOnePrimitiveClasses(D) -> SetEnum
   {Returns a set of representatives for the level 1 primitive classes of discriminant D.}
   assert D lt 0 and (D mod 4 eq 0 or D mod 4 eq 1);
 
-  forms := {};
-  bound := Isqrt(-D div 3);
-  for a in [1 .. bound] do
-    for b in [-a + 1 .. a] do
-      is_div, c := IsDivisibleBy(b^2 - D, 4*a);
-      if is_div and IsPrimitiveOneReduced(a, b, c) then
-        Include(~forms, [a, b, c]);
-      end if;
-    end for;
-  end for;
-
-  return forms;
+  L := LevelOneClasses(D);
+  return [l : l in L | IsPrimitive(l[1], l[2], l[3])];
 end intrinsic;
 
-intrinsic LevelNEquivalentForms(a, b, c, N) -> SetEnum
+intrinsic LevelNEquivalentForms(a, b, c, N) -> SeqEnum[SeqEnum[RngIntElt]]
   {Return the reduced level N forms which are 1-equivalent to (a,b,c).}
 
   gamma0 := GammaUpper0(N);
@@ -258,40 +248,23 @@ intrinsic LevelNEquivalentForms(a, b, c, N) -> SetEnum
     Include(~forms, [a_equiv, b_equiv, c_equiv]);
   end for;
 
-  return forms;
+  return Setseq(forms);
 end intrinsic;
 
-intrinsic IsLevelNPrimitive(a, b, c, N) -> SetEnum
+intrinsic IsLevelNPrimitive(a, b, c, N) -> BoolElt
   {Returns if a the level N quadratic form (a, b, c) is N-primitive.}
 
   return Gcd([a div N, b, c]) eq 1;
 end intrinsic;
 
-intrinsic LevelNClasses(D, N) -> SetEnum
-  {Returns a reduced representative for each class of forms of level N and discriminant D.}
+intrinsic LevelNClasses(D, N) -> SeqEnum
+  {Returns the reduced level N forms of discriminant D.}
 
-  forms := { PowerSequence(Integers()) | };
-  for d in Divisors(N) do
-    is_div, D_dsq := IsDivisibleBy(D, d^2);
-    if is_div and (D_dsq mod 4 eq 0 or D_dsq mod 4 eq 1) then
-      N_d := N div d;
-      level_one_forms := LevelOneClasses(D_dsq);
-      for one_form in level_one_forms do
-        a := d*one_form[1]; b := d*one_form[2]; c := d*one_form[3];
-        equiv := LevelNEquivalentForms(a, b, c, N);
-        for form in equiv do
-          if IsLevelNPrimitive(form[1], form[2], form[3], N) then
-            Include(~forms, form);
-          end if;
-        end for;
-      end for;
-    end if;
-  end for;
-
-  return forms;
+  level_one_forms := LevelOneClasses(D);
+  return &cat[LevelNEquivalentForms(l[1], l[2], l[3], N) : l in level_one_forms];
 end intrinsic;
 
-intrinsic LevelNPrimitiveClasses(D, N) -> SetEnum
+intrinsic LevelNPrimitiveClasses(D, N) -> SeqEnum
   {Returns a reduced representative for each primitive class of forms of level N and discriminant D.}
 
   forms := { PowerSequence(Integers()) | };
@@ -312,17 +285,17 @@ intrinsic LevelNPrimitiveClasses(D, N) -> SetEnum
     end if;
   end for;
 
-  return forms;
+  return Setseq(forms);
 end intrinsic;
 
 intrinsic ReducedIndices(prec, N) -> SeqEnum
-  {Returns the set of level N primtitive reduced representatives for each discriminant up toprec.}
+  {Returns the set of level N primtitive reduced representatives for each discriminant up to prec.}
   indices := [];
   for k in [1 .. prec div 4] do
     D := -4*k + 1;
-    Append(~indices, <D, LevelNClasses(D, N)>);
+    Append(~indices, <D, LevelNPrimitiveClasses(D, N)>);
     D -:= 1;
-    Append(~indices, <D, LevelNClasses(D, N)>);
+    Append(~indices, <D, LevelNPrimitiveClasses(D, N)>);
   end for;
 
   return indices;

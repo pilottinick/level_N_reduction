@@ -15,6 +15,7 @@ assert
 // the reduced forms for N = 105 and discriminant = -279
 level_105_disc_279_reduced_forms := [[105,-99,24],[105,-69,12],[105,69,12],[105,99,24],[210,-141,24],[210,-111,15],[210,-99,12],[210,-69,6],[210,69,6],[210,99,12],[210,111,15],[210,141,24],[315,-309,76],[315,-279,62],[315,-141,16],[315,-111,10],[315,-99,8],[315,-69,4],[315,69,4],[315,99,8],[315,111,10],[315,141,16],[315,279,62],[315,309,76],[420,-309,57],[420,-141,12],[420,-99,6],[420,-69,3],[420,69,3],[420,99,6],[420,141,12],[420,309,57],[525,-489,114],[525,-111,6],[525,111,6],[525,489,114],[630,-561,125],[630,-531,112],[630,-519,107],[630,-489,95],[630,-351,49],[630,-321,41],[630,-309,38],[630,-279,31],[630,-141,8],[630,-111,5],[630,-99,4],[630,-69,2],[630,69,2],[630,99,4],[630,111,5],[630,141,8],[630,279,31],[630,309,38],[630,321,41],[630,351,49],[630,489,95],[630,519,107],[630,531,112],[630,561,125],[735,-531,96],[735,-351,42],[735,351,42],[735,531,96],[840,-771,177],[840,-531,84],[840,-141,6],[840,-99,3],[840,99,3],[840,141,6],[840,531,84],[840,771,177],[1050,-561,75],[1050,-489,57],[1050,-111,3],[1050,111,3],[1050,489,57],[1050,561,75],[1260,-1149,262],[1260,-939,175],[1260,-141,4],[1260,-69,1],[1260,69,1],[1260,141,4],[1260,939,175],[1260,1149,262],[1470,-1119,213],[1470,1119,213],[1680,-1581,372],[1680,1581,372],[2100,-1989,471],[2100,1989,471],[2520,-141,2],[2520,1149,131],[2520,1581,248],[2520,2451,596]];
 assert Multiset(LevelNClasses(-279, 105)) eq Multiset(level_105_disc_279_reduced_forms);
+assert Multiset(LevelNPrimitiveClasses(-279, 105)) eq Multiset([l : l in LevelNClasses(-279, 105) | IsLevelNPrimitive(l[1], l[2], l[3], 105)]);
 
 // Number of reduced forms of level N up to discriminant -1000
 // List of [level, List of [discriminant, number of reduced forms]]
@@ -29,25 +30,18 @@ num_of_reduced_forms[12] := level_12;
 num_of_reduced_forms[16] := level_16;
 num_of_reduced_forms[105] := level_105;
 
-count := 0;
-count_bad := 0;
 for N in Keys(num_of_reduced_forms) do
   list := num_of_reduced_forms[N];
   for disc in list do
     D := disc[1];
-    //num := disc[2];
-    //num_test := #LevelNClasses(D,N);
-    num := LevelNPrimitiveClasses(D, N);
-    num_test := LevelNClasses(D, N);
+    num := disc[2];
+    num_test := #LevelNClasses(D,N);
     if not (num_test eq num) then
       printf "Fail: N = %o, D = %o, num = %o, num_test = %o\n", N, D, num, num_test;
       count_bad +:= 1;
     end if;
-    count +:= 1;
-    //assert num_test eq num;
+    assert num_test eq num;
   end for;
 end for;
 
-printf "(bad/total) is (%o/%o)", count_bad, count;
-
-//printf "Pass!";
+printf "Pass!";
