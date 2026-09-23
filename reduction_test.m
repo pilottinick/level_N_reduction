@@ -38,7 +38,6 @@ for N in Keys(num_of_reduced_forms) do
     num_test := #LevelNClasses(D,N);
     if not (num_test eq num) then
       printf "Fail: N = %o, D = %o, num = %o, num_test = %o\n", N, D, num, num_test;
-      count_bad +:= 1;
     end if;
     assert num_test eq num;
   end for;

@@ -81,7 +81,7 @@ end intrinsic;
 //    the set of integers pairs (t_1, t_2) such that gcd(t_1, t_2) = 1 and gcd(t_1 * g_1 + t_2 * g_3, N) = 1. This is
 //    implemented in AdmissibleVectors.
 // 4) K(N, g_1, g_3) is computed by an application of the topograph. The topograph is implemented in the file 
-//    topograph. Strictly speaking, we compute the sets K(N, g_1, g_3, i) for i up to a sufficiently large finite bound.
+//    topograph..m Strictly speaking, we compute the sets K(N, g_1, g_3, i) for i up to a sufficiently large finite bound.
 
 // AdmissibleVectors computes the set K(N, g_1, g_3, i).
 intrinsic AdmissibleVectors(N, g1, g3, i : T := Topograph()) -> SeqEnum
