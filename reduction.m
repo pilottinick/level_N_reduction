@@ -289,6 +289,44 @@ intrinsic LevelNPrimitiveClasses(D, N) -> SeqEnum
 end intrinsic;
 
 intrinsic ReducedIndices(prec, N) -> SeqEnum
+  {Returns the set of level N reduced representatives for each discriminant up to prec.}
+  indices := [];
+  for k in [1 .. prec div 4] do
+    D := -4*k + 1;
+    Append(~indices, <D, LevelNClasses(D, N)>);
+    D -:= 1;
+    Append(~indices, <D, LevelNClasses(D, N)>);
+  end for;
+
+  return indices;
+end intrinsic;
+
+intrinsic ReducedIndicesPlus(prec, N) -> SeqEnum
+  {Returns the set of level N reduced representatives for each discriminant up to prec, allowing Fricke and 
+   improper equivalence.}
+  indices := [];
+
+  function PlusClasses(D, N)
+    classes := {};
+    for form in LevelNClasses(D, N) do
+      a_plus, b_plus, c_plus := NReducePlus(form[1], form[2], form[3], N);
+      Include(~classes, [a_plus, b_plus, c_plus]);
+    end for;
+
+    return classes;
+  end function;
+
+  for D in Sort([3 .. prec by 4] cat [4 .. prec by 4]) do
+    simple_classes := PlusClasses(-D, N);
+    if #simple_classes gt 0 then
+      Append(~indices, <-D, simple_classes>);
+    end if;
+  end for;
+
+  return indices;
+end intrinsic;
+
+intrinsic PrimitiveReducedIndices(prec, N) -> SeqEnum
   {Returns the set of level N primtitive reduced representatives for each discriminant up to prec.}
   indices := [];
   for k in [1 .. prec div 4] do
@@ -296,6 +334,30 @@ intrinsic ReducedIndices(prec, N) -> SeqEnum
     Append(~indices, <D, LevelNPrimitiveClasses(D, N)>);
     D -:= 1;
     Append(~indices, <D, LevelNPrimitiveClasses(D, N)>);
+  end for;
+
+  return indices;
+end intrinsic;
+
+// Given a Jacobi cusp form phi of index N whose Fourier expansion is known up to O(q^prec), the following gives a 
+// complete non-redundant set of reduced Siegel modular form coefficient indices T for which a_T(Grit(phi)) can be 
+// computed.
+intrinsic GritLiftIndices(prec, N) -> SetEnum
+  {A complete non-redundant set of indices T for which a_T(Grit(phi)) can be computed, where phi is an Jacobi form of
+   index N.}
+  assert prec ge 1;
+
+  indices := {};
+  n_max := prec - 1;
+  for m in [1 .. prec - 1] do
+    mN := m*N;
+    for n in [1 .. n_max div m] do
+      bound := Isqrt(4*n*mN);
+      for r in [0 .. bound] do
+        mN_red, r_red, n_red := NReducePlus(mN, r, n, N);
+        Include(~indices, [mN_red, r_red, n_red]);
+      end for;
+    end for;
   end for;
 
   return indices;
