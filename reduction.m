@@ -339,9 +339,8 @@ intrinsic PrimitiveReducedIndices(prec, N) -> SeqEnum
   return indices;
 end intrinsic;
 
-// Given a Jacobi cusp form phi of index N whose Fourier expansion is known up to O(q^prec), the following gives a 
-// complete non-redundant set of reduced Siegel modular form coefficient indices T for which a_T(Grit(phi)) can be 
-// computed.
+// Given a Jacobi cusp form phi of index N whose Fourier expansion is known up to O(q^prec), give a complete 
+// non-redundant set of reduced Siegel modular form coefficient indices T for which a_T(Grit(phi)) can be computed.
 intrinsic GritLiftIndices(prec, N) -> SetEnum
   {A complete non-redundant set of indices T for which a_T(Grit(phi)) can be computed, where phi is an Jacobi form of
    index N.}
@@ -360,5 +359,5 @@ intrinsic GritLiftIndices(prec, N) -> SetEnum
     end for;
   end for;
 
-  return indices;
+  return SetToSequence(indices);
 end intrinsic;
